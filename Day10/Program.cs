@@ -30,27 +30,53 @@ namespace Day10
                 .First();
 
             Dir? cameFrom = null;
-            (pos, cameFrom) = Move(pos, cameFrom, map);
-
-            var positions = new List<Pos>();
-            positions.Add(pos);
-            while (map[pos.Row][pos.Col] != 'S')
+            var positionsVisited = new List<Pos>();
+            do
             {
                 (pos, cameFrom) = Move(pos, cameFrom, map);
+                positionsVisited.Add(pos);
             }
+            while (map[pos.Row][pos.Col] != 'S');
+
+            var furthestSteps = positionsVisited.Count / 2;
+            Console.WriteLine($"Part 1: {furthestSteps}");
         }
 
-        private static (Pos Next, Dir MovedDir) Move(Pos pos, Dir? cameFrom, string[] map)
+        private static (Pos Next, Dir CameFrom) Move(Pos pos, Dir? cameFrom, string[] map)
         {
             if (cameFrom != Dir.North &&
                 pos.Row > 0 &&
                 NorthConnecting.Contains(map[pos.Row][pos.Col]) &&
                 SouthConnecting.Contains(map[pos.Row - 1][pos.Col]))
             {
-                return new Pos(pos.Row - 1, pos.Col);
+                return (new Pos(pos.Row - 1, pos.Col), Dir.South);
             }
 
-            return null;
+            if (cameFrom != Dir.East &&
+                pos.Col < map[0].Length &&
+                EastConnecting.Contains(map[pos.Row][pos.Col]) &&
+                WestConnecting.Contains(map[pos.Row][pos.Col + 1]))
+            {
+                return (new Pos(pos.Row, pos.Col + 1), Dir.West);
+            }
+
+            if (cameFrom != Dir.South &&
+                pos.Row < map.Length &&
+                SouthConnecting.Contains(map[pos.Row][pos.Col]) &&
+                NorthConnecting.Contains(map[pos.Row + 1][pos.Col]))
+            {
+                return (new Pos(pos.Row + 1, pos.Col), Dir.North);
+            }
+
+            if (cameFrom != Dir.West &&
+                pos.Col > 0 &&
+                WestConnecting.Contains(map[pos.Row][pos.Col]) &&
+                EastConnecting.Contains(map[pos.Row][pos.Col - 1]))
+            {
+                return (new Pos(pos.Row, pos.Col - 1), Dir.East);
+            }
+
+            throw new Exception("Failed to make a move!");
         }
 
         private static char[] NorthConnecting = new char[] { 'S', '|', 'L', 'J' };
