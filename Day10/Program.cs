@@ -27,6 +27,7 @@ namespace Day10
                 .ToArray();
             var loop = Part1(map);
             Part2(map, loop);
+            Part2Alt(loop);
         }
 
         private static List<Pos> Part1(char[][] map)
@@ -264,6 +265,24 @@ namespace Day10
             //PrintMap(scrubbedMap, null, null);
             var tilesWithinLoop = scrubbedMap.SelectMany(row => row).Count(x => x == '.');
             Console.WriteLine($"Part 2: {tilesWithinLoop}");
+        }
+
+        private static void Part2Alt(List<Pos> loop)
+        {
+            // Shoelace formula
+            int a = 0;
+            for (int i = 0; i < loop.Count; i++)
+            {
+                a += loop[i].Col * loop[(i + 1) % loop.Count].Row;
+                a -= loop[i].Row * loop[(i + 1) % loop.Count].Col;
+            }
+            a /= 2;
+
+            // Pick's theorem
+            // A = i + (b/2) - 1
+            // i = A - (b/2) + 1
+            int points = a - (loop.Count / 2) + 1;
+            Console.WriteLine($"Part 2 alt: {points}");
         }
 
         private static void PrintMap(char[][] map, Pos? curPos, Dir? looking)
